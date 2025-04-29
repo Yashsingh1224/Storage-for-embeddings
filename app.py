@@ -41,8 +41,8 @@ def extract_features(audio, sr=16000, max_pad_len=100):
     return np.mean(features, axis=1)
 
 @app.post("/register-user")
-async def register_user(username: str = Form(...), file1: UploadFile = File(...), file2: UploadFile = File(...), file3: UploadFile = File(...)):
-    files = [file1, file2, file3]
+async def register_user(username: str = Form(...), file1: UploadFile = File(...), file2: UploadFile = File(...), file3: UploadFile = File(...), file4: UploadFile = File(...), file5: UploadFile = File(...)):
+    files = [file1, file2, file3, file4, file5]  # Handle 5 files
     embeddings = []
 
     for file in files:
@@ -62,6 +62,7 @@ async def register_user(username: str = Form(...), file1: UploadFile = File(...)
     repo.remotes.origin.push()
 
     return JSONResponse({"message": f"User {username} registered successfully."})
+
 
 @app.post("/verify-voice")
 async def verify_voice(username: str = Form(...), file: UploadFile = File(...)):
