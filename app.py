@@ -1,16 +1,21 @@
-import os
-import git
-import numpy as np
-import librosa
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import JSONResponse
+import numpy as np
+import librosa
+import git
 from scipy.spatial.distance import cosine
+import os
 
 app = FastAPI()
 
-# Set REPO_DIR to your current project directory
-REPO_DIR = os.getcwd()  # This will point to the current directory where app.py is located
-GIT_REPO_URL = "https://github.com/Yashsingh1224/Storage-for-embeddings"  # Your GitHub repo URL
+# Define the path for the embeddings folder
+REPO_DIR = os.path.join(os.getcwd(), "Embeddings")
+
+# Ensure the Embeddings directory exists
+if not os.path.exists(REPO_DIR):
+    os.makedirs(REPO_DIR)
+
+GIT_REPO_URL = "https://github.com/Yashsingh1224/Storage-for-embeddings"
 
 # Initialize the local repo if not already done
 repo = git.Repo(REPO_DIR)
@@ -49,7 +54,7 @@ async def register_user(username: str = Form(...), file1: UploadFile = File(...)
         os.remove(file.filename)
 
     avg_embedding = np.mean(np.array(embeddings), axis=0)
-    np.save(f"{REPO_DIR}/{username}.npy", avg_embedding)  # Save the .npy file in your current project directory
+    np.save(f"{REPO_DIR}/{username}.npy", avg_embedding)
 
     # Commit and push to GitHub
     repo.index.add([f"{username}.npy"])
