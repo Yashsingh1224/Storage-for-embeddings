@@ -16,6 +16,11 @@ if not os.path.exists(REPO_DIR):
     os.makedirs(REPO_DIR)
 
 GIT_REPO_URL = "https://github.com/Yashsingh1224/Storage-for-embeddings"
+if not os.path.isdir(os.path.join(REPO_DIR, ".git")):
+    repo = git.Repo.init(REPO_DIR)
+    repo.create_remote('origin', GIT_REPO_URL)
+else:
+    repo = git.Repo(REPO_DIR)
 
 # Initialize the local repo if not already done
 repo = git.Repo(REPO_DIR)
@@ -57,9 +62,13 @@ async def register_user(username: str = Form(...), file1: UploadFile = File(...)
     np.save(f"{REPO_DIR}/{username}.npy", avg_embedding)
 
     # Commit and push to GitHub
-    repo.index.add([f"{username}.npy"])
-    repo.index.commit(f"Added {username}'s embeddings")
-    repo.remotes.origin.push()
+    try:
+        repo.index.add([f"{username}.npy"])
+        repo.index.commit(f"Added {username}'s embeddings")
+        repo.remotes.origin.push()
+    except git.exc.GitCommandError as e:
+        return JSONResponse({"error": f"Failed to push to GitHub: {str(e)}"})
+
 
     return JSONResponse({"message": f"User {username} registered successfully."})
 
